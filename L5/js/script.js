@@ -1,6 +1,7 @@
 // Globala konstanter och variabler
 var boardElem;			// Referens till div-element för "spelplanen"
 const carImgs = ["car_up.png","car_right.png","car_down.png","car_left.png"];
+var pigElem; 
 						// Array med filnamn för bilderna med bilen
 var carDir = 1;			// Riktning för bilen, index till carImgs
 var carElem;			// Referens till img-element för bilen
@@ -16,6 +17,8 @@ var stopBtn;			// Referens till stoppknappen
 // ------------------------------
 // Initiera globala variabler och koppla funktion till knapp
 function init() {
+	pigElem = document.getElementById("pig");
+
 	// Referenser till element i gränssnittet
 		boardElem = document.getElementById("board");
 		carElem = document.getElementById("car");
@@ -67,6 +70,7 @@ function startGame() {
 	moveCar();
 	/* === Tillägg i labben === */
 	
+	newPig(); 
 
 } // End startGame
 // ------------------------------
@@ -115,3 +119,12 @@ function moveCar() {
 
 /* === Tillägg av nya funktioner i labben === */
 
+function newPig() {
+	let xLimit = boardElem.offsetWidth - pigElem.offsetWidth - 20; 
+	let ylimit = boardElem.offsetHeight - pigElem.offsetHeight - 20; 
+	let x = Math.floor(xlimit*Math.random())+10; 
+	let y = Math.floor(ylimit*Math.random())+10; 
+	pigElem.stlye.left = x + "px"; 
+	pigElem.stlye.top = y + "px"; 
+	pigElem.style.visibility = "visible"; 
+}

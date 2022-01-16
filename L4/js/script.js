@@ -44,6 +44,8 @@ function init() {
 		}
 		
 	// Aktivera/inaktivera knappar
+		startGameBtn.disabled = false;
+		checkAnswersBtn.disabled = true;
 		
 } // End init
 window.addEventListener("load",init); // Se till att init aktiveras då sidan är inladdad
@@ -86,6 +88,9 @@ function startGame() {
 		answerElems[i].innerHTML = "";
 		correctElems[i].innerHTML = ""; 	
 	}
+
+	startGameBtn.disabled = true;
+    checkAnswersBtn.disabled = false;
 
 } // End startGame 
 
@@ -171,12 +176,26 @@ function checkAnswers() {
 		var points = 0; 
 	}
 
-	var points = 0; 
 
 	for (let i = 0; i < answerElems.length; i++) {
 		if (answerElems[i].innerHTML == allWords[ix])
 		points++;
 	}  
+
+	var points = 0; 
+	for (let i = 0; i < answerElems.length; i++) {
+        var ix = imgElems[i].id;
+
+        if (answerElems[i].innerHTML == allWords[ix]){
+            points++;
+
+        }
+        correctElems[i].innerHTML = allWords[ix] + ' ' + allDescriptions[ix];
+
+    }
+    msgElem.innerHTML = 'Poäng: ' + points;
+	startGameBtn.disabled = true;
+    checkAnswersBtn.disabled = false;
 
 	//------------------ 7b 
 
