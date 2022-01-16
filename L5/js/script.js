@@ -1,7 +1,7 @@
 // Globala konstanter och variabler
 var boardElem;			// Referens till div-element för "spelplanen"
 const carImgs = ["car_up.png","car_right.png","car_down.png","car_left.png"];
-var pigElem; 
+
 						// Array med filnamn för bilderna med bilen
 var carDir = 1;			// Riktning för bilen, index till carImgs
 var carElem;			// Referens till img-element för bilen
@@ -12,12 +12,17 @@ var timerRef = null;	// Referens till timern för bilens förflyttning
 var startBtn;			// Referens till startknappen
 var stopBtn;			// Referens till stoppknappen
 /* === Tillägg i labben === */
-
+var pigElem; // referens till gris element  
+var pigTimerRef = null; // referens till gris timer 
+const pigDuration = 2000; // referens till hur länge en gris ska visas på skärmen 
+var pigNr; // referens till nummer för akutell gris 
+var hitCounter; // referens till antal träffar 
+var pigNrElem; // declarerar pigNr som global variabler 
+var hitCounterElem; // declarerar hitCounter som global variabel
 
 // ------------------------------
 // Initiera globala variabler och koppla funktion till knapp
 function init() {
-	pigElem = document.getElementById("pig");
 
 	// Referenser till element i gränssnittet
 		boardElem = document.getElementById("board");
@@ -33,7 +38,9 @@ function init() {
 		startBtn.disabled = false;
 		stopBtn.disabled = true;
 	/* === Tillägg i labben === */
-	
+	pigElem = document.getElementById("pig");
+	pigNrElem = document.getElementById("pigNr");
+	hitCounterElem = document.getElementById("hitCounter");   
 
 } // End init
 window.addEventListener("load",init);
@@ -67,10 +74,13 @@ function startGame() {
 	carElem.style.top = "0px";
 	carDir = 1;
 	carElem.src = "img/" + carImgs[carDir];
-	moveCar();
+	moveCar(); // anrop 
 	/* === Tillägg i labben === */
-	
-	newPig(); 
+	pigNr = 0; // Pig counter börjar på 0 när spelet börjar 
+	hitCounter = 0; // Hit counter börjar på 0 när spelet börjar
+	pigNrElem.innerHTML = "0"; // Pig count återställs på skärmen 
+	hitCounterElem.innerHTML = "0"; // Hit counter återställs på skärmen
+	pigTimerRef = setTimeout(newPig,pigDuration); 
 
 } // End startGame
 // ------------------------------
@@ -80,8 +90,8 @@ function stopGame() {
 	startBtn.disabled = false;
 	stopBtn.disabled = true;
 	/* === Tillägg i labben === */
-	
-
+	if (pigTimerRef != null) clearTimeout(pigTimerRef); // om timer stannar ska gris bilderna inte visas
+	pigElem.style.visibility = "hidden"; 
 } // End stopGame
 // ------------------------------
 // Flytta bilen ett steg framåt i bilens riktning
@@ -112,7 +122,7 @@ function moveCar() {
 	carElem.style.top = y + "px";
 	timerRef = setTimeout(moveCar,timerStep);
 	/* === Tillägg i labben === */
-	
+	checkHit(); // anropar functionen checkHit 
 
 } // End moveCar
 // ------------------------------
@@ -120,11 +130,37 @@ function moveCar() {
 /* === Tillägg av nya funktioner i labben === */
 
 function newPig() {
-	let xLimit = boardElem.offsetWidth - pigElem.offsetWidth - 20; 
-	let ylimit = boardElem.offsetHeight - pigElem.offsetHeight - 20; 
-	let x = Math.floor(xlimit*Math.random())+10; 
-	let y = Math.floor(ylimit*Math.random())+10; 
-	pigElem.stlye.left = x + "px"; 
-	pigElem.stlye.top = y + "px"; 
+	if (pigNr < 10) {
+	let xLimit = boardElem.offsetWidth - pigElem.offsetWidth - 20; // bestämmer marginalen mellan grisen och boardwidth
+	let yLimit = boardElem.offsetHeight - pigElem.offsetHeight - 20; // bestämmer marginalen mellan grisen och boardheight
+	let x = Math.floor(xLimit*Math.random())+10; // slumptal för vänster-koordinat
+	let y = Math.floor(yLimit*Math.random())+10; // slumptal för topp koordinat
+	pigElem.style.left = x + "px"; 
+	pigElem.style.top = y + "px"; 
+	pigElem.src = "img/pig.png"; 
 	pigElem.style.visibility = "visible"; 
+	pigTimerRef = setTimeout(newPig,pigDuration); 
+	pigNr++; 
+	pigNrElem.innerHTML = pigNr; 	
+	} 
+	else stopGame(); 
+} 
+
+
+
+function checkHit() {
+	var cSize = carElem.offsetWidth; // Bestämmer storleken av bilen 
+	var pSize = pigElem.offsetWidth; // Bestämmer storleken av prisen 
+	let cL = parseInt(carElem.style.left); // Vänster sidan av bilen 
+	let cT = parseInt(carElem.style.top);  // Toppen av bilen 
+	let pL = parseInt(pigElem.style.left);  // Vänster sidan av grisen 
+	let pT = parseInt(pigElem.style.top);  // Toppen av grisen 
+	if (cL+10 < pL+pSize && cL+cSize-10 > pL && cT+10 < pT+pSize && cT+cSize-10 > pT){ // regler som bestämmer ifall bilen och grisen krockar med varandra 
+		clearTimeout(pigTimerRef); // Stoppa timer
+		pigElem.src = "img/smack.png"; 
+		pigTimerRef = setTimeout(newPig, pigDuration); 
+	}
+	hitCounterElem++; 
+	
 }
+
