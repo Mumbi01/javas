@@ -19,6 +19,7 @@ var pigNr; // referens till nummer för akutell gris
 var hitCounter; // referens till antal träffar 
 var pigNrElem; // declarerar pigNr som global variabler 
 var hitCounterElem; // declarerar hitCounter som global variabel
+var catchedPig; // refferar till att grisen har träffats 
 
 // ------------------------------
 // Initiera globala variabler och koppla funktion till knapp
@@ -81,7 +82,7 @@ function startGame() {
 	pigNrElem.innerHTML = "0"; // Pig count återställs på skärmen 
 	hitCounterElem.innerHTML = "0"; // Hit counter återställs på skärmen
 	pigTimerRef = setTimeout(newPig,pigDuration); 
-
+	catchedPig = true; 
 } // End startGame
 // ------------------------------
 // Stoppa spelet
@@ -138,10 +139,11 @@ function newPig() {
 	pigElem.style.left = x + "px"; 
 	pigElem.style.top = y + "px"; 
 	pigElem.src = "img/pig.png"; 
-	pigElem.style.visibility = "visible"; 
+	pigElem.style.visibility = "visible";  	
 	pigTimerRef = setTimeout(newPig,pigDuration); 
 	pigNr++; 
-	pigNrElem.innerHTML = pigNr; 	
+	catchedPig = false;
+	pigNrElem.innerHTML = pigNr; 
 	} 
 	else stopGame(); 
 } 
@@ -149,6 +151,7 @@ function newPig() {
 
 
 function checkHit() {
+	if (catchedPig) return; // grisen är redan träffad, ska ej räknas igen
 	var cSize = carElem.offsetWidth; // Bestämmer storleken av bilen 
 	var pSize = pigElem.offsetWidth; // Bestämmer storleken av prisen 
 	let cL = parseInt(carElem.style.left); // Vänster sidan av bilen 
@@ -156,11 +159,13 @@ function checkHit() {
 	let pL = parseInt(pigElem.style.left);  // Vänster sidan av grisen 
 	let pT = parseInt(pigElem.style.top);  // Toppen av grisen 
 	if (cL+10 < pL+pSize && cL+cSize-10 > pL && cT+10 < pT+pSize && cT+cSize-10 > pT){ // regler som bestämmer ifall bilen och grisen krockar med varandra 
+		catchedPig = true;
 		clearTimeout(pigTimerRef); // Stoppa timer
 		pigElem.src = "img/smack.png"; 
-		pigTimerRef = setTimeout(newPig, pigDuration); 
+		pigTimerRef = setTimeout(newPig, pigDuration);
+		  
 	}
-	hitCounterElem++; 
-	
+	hitCounter++; 
+	hitCounterElem.innerHTML = hitCounter; 
 }
 
